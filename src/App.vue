@@ -3,16 +3,19 @@
   <div class="container">
     <h1>Tic-Tac-Toe</h1>
     <div class="play-area">
-      <div id="block_0" class="block"></div>
-      <div id="block_1" class="block"></div>
-      <div id="block_2" class="block"></div>
-      <div id="block_3" class="block"></div>
-      <div id="block_4" class="block"></div>
-      <div id="block_5" class="block"></div>
-      <div id="block_6" class="block"></div>
-      <div id="block_7" class="block"></div>
-      <div id="block_8" class="block"></div>
+      <div id="block_0" class="block" @click="draw(0)">{{ content[0] }}</div>
+      <div id="block_1" class="block" @click="draw(1)">{{ content[1] }}</div>
+      <div id="block_2" class="block" @click="draw(2)">{{ content[2] }}</div>
+      <div id="block_3" class="block" @click="draw(3)">{{ content[3] }}</div>
+      <div id="block_4" class="block" @click="draw(4)">{{ content[4] }}</div>
+      <div id="block_5" class="block" @click="draw(5)">{{ content[5] }}</div>
+      <div id="block_6" class="block" @click="draw(6)">{{ content[6] }}</div>
+      <div id="block_7" class="block" @click="draw(7)">{{ content[7] }}</div>
+      <div id="block_8" class="block" @click="draw(8)">{{ content[8] }}</div>
     </div>
+    <h2 id="winner" v-if="isOver">Winner is {{ winner }}</h2>
+    <h2 v-if="isTie">Game is Tie</h2>
+    <button @click="resetBoard()" v-if="isOver || isTie">RESET</button>
   </div>
 </template>
 
@@ -21,6 +24,79 @@
 export default {
   name: 'App',
   components: {
+  },
+  data() {
+    return {
+      content: ["", "", "", "", "", "", "", "", ""],
+      turn: true,
+      isOver: false,
+      isTie: false,
+      winner: null
+    }
+  },
+  methods: {
+    draw(index) {
+      if (this.isOver || this.content[index] != "") {
+        return
+      }
+      if (this.turn) {
+        this.content[index] = "X"
+      } else {
+        this.content[index] = "0"
+      }
+      this.turn = !this.turn
+      this.calculateWinner();
+      if (!this.over) {
+        //if game not over, check tie
+        this.checkTie();
+      }
+    },
+
+    calculateWinner(){
+      // first row
+      const WIN_CONDITIONS = [
+              // rows
+              [0, 1, 2], [3, 4, 5], [6, 7, 8],
+              // cols
+              [0, 3, 6], [1, 4, 7, 2, 5, 8],
+              // diagonals
+              [0, 4, 5], [2, 4, 6]
+
+      ]
+
+      for(let i = 0; i < WIN_CONDITIONS.length; i++) {
+        let first = WIN_CONDITIONS[i][0];
+        let second = WIN_CONDITIONS[i][1];
+        let third = WIN_CONDITIONS[i][2];
+        if (this.content[first] == this.content[second]
+                && this.content[first] == this.content[third]
+                && this.content[first] != "") {
+          this.isOver = true;
+          this.winner = this.content[first];
+        }
+      }
+
+    },
+    // check if game is tie
+    checkTie() {
+      if (this.isOver) {
+        return;
+      }
+      for (let i = 0 ; i<= 8 ; i++) {
+        if(this.content[i] == ""){
+          return;
+        }
+      }
+      this.isTie = true
+    },
+    resetBoard() {
+      for (let i= 0 ; i <= 8; i++) {
+        this.content[i] = "";
+        this.isOver = false;
+        this.winner = null;
+        this.isTie = false;
+      }
+    }
   }
 }
 </script>
