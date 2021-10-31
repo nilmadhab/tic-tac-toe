@@ -20,7 +20,12 @@
 </template>
 
 <script>
-
+import io from 'socket.io-client'
+const socket = io("http://localhost:3000");
+socket.on("hello", (arg) => {
+  console.log(arg); // world
+});
+// socket.emit("play", "X", 1)
 export default {
   name: 'App',
   components: {
@@ -36,13 +41,19 @@ export default {
   },
   methods: {
     draw(index) {
+      // client-side
+      // socket.on("hello", (arg) => {
+      //   console.log(arg); // world
+      // });
       if (this.isOver || this.content[index] != "") {
         return
       }
       if (this.turn) {
         this.content[index] = "X"
+        socket.emit("play", "X", index)
       } else {
         this.content[index] = "0"
+        socket.emit("play", "O", index)
       }
       this.turn = !this.turn
       this.calculateWinner();
@@ -97,6 +108,12 @@ export default {
         this.isTie = false;
       }
     }
+  },
+  created() {
+    socket.on("play", (player, index) => {
+      console.log("received", player, index); // world
+      this.draw(index)
+    });
   }
 }
 </script>
